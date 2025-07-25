@@ -423,3 +423,100 @@ window.debugClient = () => {
   console.log("Commandes client:", commandesClient);
   console.log("Fonction de lecture stock:", lireStock);
 };
+
+// ========================================
+// GESTION DU MODAL ADMIN
+// ========================================
+
+// Configuration
+const ADMIN_PASSWORD = "ferme2025"; // Change ce mot de passe !
+
+// Fonction d'initialisation du modal admin
+function initModalAdmin() {
+  // Éléments DOM
+  const adminLink = document.getElementById("admin-link");
+  const adminModal = document.getElementById("admin-modal");
+  const adminPasswordInput = document.getElementById("admin-password");
+  const adminLoginBtn = document.getElementById("admin-login");
+  const adminCancelBtn = document.getElementById("admin-cancel");
+  const adminError = document.getElementById("admin-error");
+
+  // Vérifier que tous les éléments existent
+  if (
+    !adminLink ||
+    !adminModal ||
+    !adminPasswordInput ||
+    !adminLoginBtn ||
+    !adminCancelBtn ||
+    !adminError
+  ) {
+    console.warn("Éléments du modal admin non trouvés");
+    return;
+  }
+
+  // Ouvrir le modal
+  adminLink.addEventListener("click", (e) => {
+    e.preventDefault();
+    adminModal.style.display = "block";
+    adminPasswordInput.focus();
+    adminError.style.display = "none";
+    adminPasswordInput.value = "";
+  });
+
+  // Fermer le modal
+  adminCancelBtn.addEventListener("click", () => {
+    adminModal.style.display = "none";
+  });
+
+  // Fermer en cliquant à l'extérieur
+  adminModal.addEventListener("click", (e) => {
+    if (e.target === adminModal) {
+      adminModal.style.display = "none";
+    }
+  });
+
+  // Connexion
+  adminLoginBtn.addEventListener("click", () => {
+    const password = adminPasswordInput.value.trim();
+
+    if (password === ADMIN_PASSWORD) {
+      // Connexion réussie
+      adminModal.style.display = "none";
+      window.location.href = "admin.html";
+    } else {
+      // Mot de passe incorrect
+      adminError.style.display = "block";
+      adminPasswordInput.value = "";
+      adminPasswordInput.focus();
+
+      // Animation d'erreur
+      adminPasswordInput.style.borderColor = "#e74c3c";
+      adminPasswordInput.style.animation = "shake 0.5s ease-in-out";
+
+      setTimeout(() => {
+        adminPasswordInput.style.borderColor = "#bdc3c7";
+        adminPasswordInput.style.animation = "";
+      }, 500);
+    }
+  });
+
+  // Connexion avec Enter
+  adminPasswordInput.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") {
+      adminLoginBtn.click();
+    }
+  });
+
+  // Fermer avec Escape
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && adminModal.style.display === "block") {
+      adminModal.style.display = "none";
+    }
+  });
+}
+
+// Initialiser le modal quand le DOM est chargé
+document.addEventListener("DOMContentLoaded", () => {
+  // Attendre un peu pour que tous les éléments soient prêts
+  setTimeout(initModalAdmin, 100);
+});
