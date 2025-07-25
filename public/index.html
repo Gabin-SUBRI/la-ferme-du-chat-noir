@@ -50,5 +50,265 @@
     </div>
 
     <div id="message"></div>
+    <!-- À ajouter avant la fermeture de </body> dans index.html -->
+    <!-- À ajouter avant la fermeture de </body> dans index.html -->
+
+    <!-- Footer avec lien admin -->
+    <footer
+      style="
+        text-align: center;
+        margin-top: 40px;
+        padding: 20px;
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
+      "
+    >
+      <a
+        href="#"
+        id="admin-link"
+        style="
+          color: rgba(255, 255, 255, 0.7);
+          text-decoration: none;
+          font-size: 0.9rem;
+          transition: color 0.3s ease;
+        "
+      >
+        🔧 Accès administrateur
+      </a>
+    </footer>
+
+    <!-- Modal de connexion admin -->
+    <div
+      id="admin-modal"
+      style="
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        z-index: 1000;
+        animation: fadeIn 0.3s ease;
+      "
+    >
+      <div
+        style="
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          background: white;
+          padding: 40px;
+          border-radius: 15px;
+          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+          min-width: 300px;
+          text-align: center;
+          animation: slideIn 0.4s ease;
+        "
+      >
+        <h3 style="margin-bottom: 25px; color: #2c3e50; font-size: 1.5rem">
+          🔐 Connexion Administrateur
+        </h3>
+
+        <div style="margin-bottom: 20px">
+          <input
+            type="password"
+            id="admin-password"
+            placeholder="Mot de passe administrateur"
+            style="
+              width: 100%;
+              padding: 15px;
+              border: 2px solid #bdc3c7;
+              border-radius: 8px;
+              font-size: 1rem;
+              margin-bottom: 15px;
+              transition: border-color 0.3s ease;
+            "
+          />
+        </div>
+
+        <div style="display: flex; gap: 10px; justify-content: center">
+          <button
+            id="admin-login"
+            style="
+              background: linear-gradient(135deg, #27ae60, #2ecc71);
+              color: white;
+              border: none;
+              padding: 12px 25px;
+              border-radius: 8px;
+              cursor: pointer;
+              font-weight: 600;
+              transition: all 0.3s ease;
+            "
+          >
+            ✅ Connexion
+          </button>
+
+          <button
+            id="admin-cancel"
+            style="
+              background: linear-gradient(135deg, #e74c3c, #c0392b);
+              color: white;
+              border: none;
+              padding: 12px 25px;
+              border-radius: 8px;
+              cursor: pointer;
+              font-weight: 600;
+              transition: all 0.3s ease;
+            "
+          >
+            ❌ Annuler
+          </button>
+        </div>
+
+        <div
+          id="admin-error"
+          style="
+            margin-top: 15px;
+            padding: 10px;
+            background: #f8d7da;
+            color: #721c24;
+            border-radius: 5px;
+            display: none;
+            font-size: 0.9rem;
+          "
+        >
+          ❌ Mot de passe incorrect
+        </div>
+      </div>
+    </div>
+
+    <style>
+      /* Animations pour le modal */
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translate(-50%, -60%);
+        }
+        to {
+          opacity: 1;
+          transform: translate(-50%, -50%);
+        }
+      }
+
+      /* Effets hover sur les boutons du modal */
+      #admin-login:hover {
+        background: linear-gradient(135deg, #2ecc71, #27ae60);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3);
+      }
+
+      #admin-cancel:hover {
+        background: linear-gradient(135deg, #c0392b, #a93226);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
+      }
+
+      #admin-link:hover {
+        color: white !important;
+      }
+
+      /* Responsive modal */
+      @media (max-width: 480px) {
+        #admin-modal > div {
+          margin: 20px;
+          padding: 30px 20px;
+          min-width: auto;
+        }
+      }
+    </style>
+
+    <script>
+      // Configuration
+      const ADMIN_PASSWORD = "admin123"; // Change ce mot de passe !
+
+      // Éléments DOM
+      const adminLink = document.getElementById("admin-link");
+      const adminModal = document.getElementById("admin-modal");
+      const adminPasswordInput = document.getElementById("admin-password");
+      const adminLoginBtn = document.getElementById("admin-login");
+      const adminCancelBtn = document.getElementById("admin-cancel");
+      const adminError = document.getElementById("admin-error");
+
+      // Ouvrir le modal
+      adminLink.addEventListener("click", (e) => {
+        e.preventDefault();
+        adminModal.style.display = "block";
+        adminPasswordInput.focus();
+        adminError.style.display = "none";
+        adminPasswordInput.value = "";
+      });
+
+      // Fermer le modal
+      adminCancelBtn.addEventListener("click", () => {
+        adminModal.style.display = "none";
+      });
+
+      // Fermer en cliquant à l'extérieur
+      adminModal.addEventListener("click", (e) => {
+        if (e.target === adminModal) {
+          adminModal.style.display = "none";
+        }
+      });
+
+      // Connexion
+      adminLoginBtn.addEventListener("click", () => {
+        const password = adminPasswordInput.value.trim();
+
+        if (password === ADMIN_PASSWORD) {
+          // Connexion réussie
+          adminModal.style.display = "none";
+          window.location.href = "admin.html";
+        } else {
+          // Mot de passe incorrect
+          adminError.style.display = "block";
+          adminPasswordInput.value = "";
+          adminPasswordInput.focus();
+
+          // Animation d'erreur
+          adminPasswordInput.style.borderColor = "#e74c3c";
+          adminPasswordInput.style.animation = "shake 0.5s ease-in-out";
+
+          setTimeout(() => {
+            adminPasswordInput.style.borderColor = "#bdc3c7";
+            adminPasswordInput.style.animation = "";
+          }, 500);
+        }
+      });
+
+      // Connexion avec Enter
+      adminPasswordInput.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") {
+          adminLoginBtn.click();
+        }
+      });
+
+      // Fermer avec Escape
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && adminModal.style.display === "block") {
+          adminModal.style.display = "none";
+        }
+      });
+
+      // Animation de shake pour l'erreur
+      const style = document.createElement("style");
+      style.textContent = `
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+  }
+`;
+      document.head.appendChild(style);
+    </script>
   </body>
 </html>
