@@ -429,7 +429,8 @@ window.debugClient = () => {
 // ========================================
 
 // Configuration
-const ADMIN_PASSWORD = "ferme2025"; // Change ce mot de passe !
+// Récupérer la variable d'environnement depuis Vercel
+const ADMIN_PASSWORD = process.env.ADMIN;
 
 // Fonction d'initialisation du modal admin
 function initModalAdmin() {
