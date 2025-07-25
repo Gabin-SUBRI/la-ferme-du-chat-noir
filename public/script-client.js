@@ -430,8 +430,12 @@ window.debugClient = () => {
 
 // Configuration
 // Récupérer la variable d'environnement depuis Vercel
-const ADMIN_PASSWORD = process.env.ADMIN;
+// Mot de passe encodé en Base64 (plus sécurisé que du texte clair)
+const ADMIN_PASSWORD_HASH = "ZmVybWUyMDI1"; // "ferme2025" encodé
 
+function verifierMotDePasse(motDePasse) {
+  return btoa(motDePasse) === ADMIN_PASSWORD_HASH;
+}
 // Fonction d'initialisation du modal admin
 function initModalAdmin() {
   // Éléments DOM
@@ -480,7 +484,7 @@ function initModalAdmin() {
   adminLoginBtn.addEventListener("click", () => {
     const password = adminPasswordInput.value.trim();
 
-    if (password === ADMIN_PASSWORD) {
+    if (verifierMotDePasse(password)) {
       // Connexion réussie
       adminModal.style.display = "none";
       window.location.href = "admin.html";
