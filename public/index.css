@@ -1222,3 +1222,146 @@ footer a {
     width: 100%;
   }
 }
+/* Footer principal */
+.main-footer {
+  background: linear-gradient(135deg, #2c3e50, #34495e);
+  color: white;
+  margin-top: 50px;
+  border-radius: 20px 20px 0 0;
+  overflow: hidden;
+  box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.footer-content {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 40px;
+  padding: 40px 30px;
+}
+
+.footer-section h4 {
+  color: #3498db;
+  margin-bottom: 15px;
+  font-size: 1.2rem;
+  border-bottom: 2px solid #3498db;
+  padding-bottom: 8px;
+  display: inline-block;
+}
+
+.footer-section p {
+  margin-bottom: 8px;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.6;
+}
+
+.admin-link {
+  display: inline-block;
+  margin-top: 15px;
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #e74c3c, #c0392b);
+  color: white !important;
+  text-decoration: none;
+  border-radius: 25px;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.admin-link:hover {
+  background: linear-gradient(135deg, #c0392b, #a93226);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.footer-certif {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 15px 0;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.footer-bio-logo {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+  background: white;
+  border-radius: 4px;
+  padding: 3px;
+}
+
+.footer-certif span {
+  color: #3498db;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.footer-bottom {
+  background: rgba(0, 0, 0, 0.2);
+  padding: 20px 30px;
+  text-align: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footer-bottom p {
+  margin: 5px 0;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+}
+
+.footer-bottom a {
+  color: #3498db;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+.footer-bottom a:hover {
+  color: #5dade2;
+  text-decoration: underline;
+}
+
+/* Lien téléphone */
+.phone-link {
+  color: #3498db !important;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+.phone-link:hover {
+  color: #5dade2 !important;
+  text-decoration: underline;
+}
+
+/* Lien développeur invisible mais fonctionnel */
+.dev-credit {
+  color: inherit !important;
+  text-decoration: none !important;
+  cursor: default;
+  transition: all 0.3s ease;
+}
+
+.dev-credit:hover {
+  color: inherit !important;
+  text-decoration: none !important;
+  cursor: pointer;
+  opacity: 0.8;
+}
+
+/* Responsive footer */
+@media (max-width: 768px) {
+  .footer-content {
+    grid-template-columns: 1fr;
+    gap: 30px;
+    padding: 30px 20px;
+  }
+
+  .footer-bottom {
+    padding: 15px 20px;
+  }
+}
