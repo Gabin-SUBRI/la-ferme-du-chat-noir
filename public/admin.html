@@ -1,57 +1,71 @@
-<body>
-  <h1>Panneau Admin – Légumes & Commandes</h1>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Administration - Légumes & Commandes</title>
+    <link rel="stylesheet" href="admin.css" />
+  </head>
+  <body>
+    <h1>Panneau Admin – Légumes & Commandes</h1>
 
-  <!-- Section Stock -->
-  <section>
-    <h2>📦 Ajouter un légume à vendre</h2>
-    <form id="form-stock">
-      <input type="text" id="nom" placeholder="Nom du légume" required />
-      <input
-        type="number"
-        id="quantite"
-        placeholder="Quantité en stock"
-        required
-      />
-      <input type="number" id="prix" placeholder="Prix unitaire (€)" required />
-      <input
-        type="text"
-        id="unite"
-        placeholder="Unité (pièce, kg, boîte...)"
-        required
-      />
-      <button type="submit">Ajouter au stock</button>
-    </form>
+    <!-- Section Stock -->
+    <section>
+      <h2>📦 Ajouter un légume à vendre</h2>
+      <form id="form-stock">
+        <input type="text" id="nom" placeholder="Nom du légume" required />
+        <input
+          type="number"
+          id="quantite"
+          placeholder="Quantité en stock"
+          required
+        />
+        <input
+          type="number"
+          id="prix"
+          placeholder="Prix unitaire (€)"
+          required
+        />
+        <input
+          type="text"
+          id="unite"
+          placeholder="Unité (pièce, kg, boîte...)"
+          required
+        />
+        <button type="submit">Ajouter au stock</button>
+      </form>
 
-    <h3>🧺 Stock actuel</h3>
-    <table border="1">
-      <thead>
-        <tr>
-          <th>Nom</th>
-          <th>Quantité</th>
-          <th>Unité</th>
-          <th>Prix</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody id="table-stock"></tbody>
-    </table>
-  </section>
+      <h3>🧺 Stock actuel</h3>
+      <table border="1">
+        <thead>
+          <tr>
+            <th>Nom</th>
+            <th>Quantité</th>
+            <th>Unité</th>
+            <th>Prix</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="table-stock"></tbody>
+      </table>
+    </section>
 
-  <!-- Section Commandes -->
-  <section>
-    <h2>Commandes à préparer</h2>
-    <table id="table-preparation">
-      <thead>
-        <tr>
-          <th>Client</th>
-          <th>Produit</th>
-          <th>Quantité</th>
-          <th>Unité</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </section>
+    <!-- Section Commandes -->
+    <section>
+      <h2>Commandes à préparer</h2>
+      <table id="table-preparation">
+        <thead>
+          <tr>
+            <th>Client</th>
+            <th>Produit</th>
+            <th>Quantité</th>
+            <th>Unité</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
 
-  <script src="admin.js" defer></script>
-</body>
+    <script src="admin.js" defer></script>
+  </body>
+</html>
