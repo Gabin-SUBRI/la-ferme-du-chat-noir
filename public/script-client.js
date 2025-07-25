@@ -2,9 +2,11 @@
 const JSONBIN_API_KEY =
   "$2a$10$6kUDySCUaKoUY.UGsOqahOx4ep7ZYufpGYapG47UEQRGGPu70LABa";
 const STOCK_BIN_ID = "6883fcf7ae596e708fbbca13";
+const COMMANDES_BIN_ID = "6883ff07ae596e708fbbcab7";
 
-// URL de l'API JSONBin pour le stock
+// URLs de l'API JSONBin
 const STOCK_URL = `https://api.jsonbin.io/v3/b/${STOCK_BIN_ID}`;
+const COMMANDES_URL = `https://api.jsonbin.io/v3/b/${COMMANDES_BIN_ID}`;
 
 // Headers pour JSONBin
 const headers = {
@@ -90,7 +92,45 @@ async function chargerStock() {
   }
 }
 
-// Mise à jour du stock après commande
+// Fonction pour sauvegarder une commande
+async function sauvegarderCommande(commandesValidees, nomClient) {
+  try {
+    // Lire les commandes existantes
+    const response = await fetch(COMMANDES_URL, { headers });
+    const data = await response.json();
+    const commandesExistantes = data.record.filter(
+      (cmd) => cmd.nom !== "exemple"
+    );
+
+    // Créer l'objet commande avec timestamp
+    const nouvelleCommande = {
+      id: Date.now(), // ID unique basé sur le timestamp
+      client: nomClient,
+      produits: commandesValidees,
+      total: commandesValidees.reduce(
+        (sum, cmd) => sum + cmd.quantite * cmd.prix,
+        0
+      ),
+      date: new Date().toLocaleString("fr-FR"),
+      statut: "à préparer",
+    };
+
+    // Ajouter la nouvelle commande
+    commandesExistantes.push(nouvelleCommande);
+
+    // Sauvegarder
+    const saveResponse = await fetch(COMMANDES_URL, {
+      method: "PUT",
+      headers,
+      body: JSON.stringify(commandesExistantes),
+    });
+
+    return saveResponse.ok;
+  } catch (error) {
+    console.error("Erreur sauvegarde commande:", error);
+    return false;
+  }
+}
 async function mettreAJourStock(commandesValidees) {
   try {
     const stockActuel = await lireStock();
@@ -293,10 +333,13 @@ document
         return;
       }
 
-      // Mettre à jour le stock
-      const succes = await mettreAJourStock(commandesClient);
+      // Mettre à jour le stock et sauvegarder la commande
+      const [stockMisAJour, commandeSauvee] = await Promise.all([
+        mettreAJourStock(commandesClient),
+        sauvegarderCommande(commandesClient, nomClient),
+      ]);
 
-      if (succes) {
+      if (stockMisAJour && commandeSauvee) {
         // Calculer le total
         let total = 0;
         const lignes = commandesClient.map((cmd) => {
@@ -328,6 +371,8 @@ document
           "❌ Erreur lors de la validation de la commande",
           "error"
         );
+        // Recharger le stock au cas où il aurait été modifié partiellement
+        chargerStock();
       }
     } catch (err) {
       console.error("Erreur lors de la validation :", err);

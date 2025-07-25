@@ -2,7 +2,7 @@
 const JSONBIN_API_KEY =
   "$2a$10$6kUDySCUaKoUY.UGsOqahOx4ep7ZYufpGYapG47UEQRGGPu70LABa";
 const STOCK_BIN_ID = "6883fcf7ae596e708fbbca13";
-const COMMANDES_BIN_ID = "6883fcf7ae596e708fbbca13"; // Même bin pour le moment, on peut séparer après
+const COMMANDES_BIN_ID = "6883ff07ae596e708fbbcab7";
 
 // URLs de l'API JSONBin
 const STOCK_URL = `https://api.jsonbin.io/v3/b/${STOCK_BIN_ID}`;
@@ -153,16 +153,139 @@ async function supprimerLegume(index) {
   }
 }
 
-// Fonctions pour les commandes (simulation pour l'instant)
+// Fonctions pour les commandes
+async function lireCommandes() {
+  try {
+    const response = await fetch(COMMANDES_URL, { headers });
+    const data = await response.json();
+    // Filtre l'élément "exemple" et retourne les commandes
+    return data.record.filter((cmd) => cmd.nom !== "exemple");
+  } catch (error) {
+    console.error("Erreur lecture commandes:", error);
+    return [];
+  }
+}
+
+async function sauvegarderCommandes(commandes) {
+  try {
+    const response = await fetch(COMMANDES_URL, {
+      method: "PUT",
+      headers,
+      body: JSON.stringify(commandes),
+    });
+    return response.ok;
+  } catch (error) {
+    console.error("Erreur sauvegarde commandes:", error);
+    return false;
+  }
+}
+
 async function chargerCommandesPreparation() {
   try {
-    // Pour l'instant, on simule des commandes vides
-    // Plus tard, on pourra créer un bin séparé pour les commandes
+    const commandes = await lireCommandes();
     const tbody = document.querySelector("#table-preparation tbody");
-    tbody.innerHTML =
-      '<tr><td colspan="4" style="text-align: center; font-style: italic; color: #666;">Aucune commande en préparation</td></tr>';
+    tbody.innerHTML = "";
+
+    if (commandes.length === 0) {
+      tbody.innerHTML =
+        '<tr><td colspan="6" style="text-align: center; font-style: italic; color: #666;">Aucune commande en préparation</td></tr>';
+      return;
+    }
+
+    // Trier les commandes par date (plus récentes en premier)
+    commandes.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    commandes.forEach((commande, index) => {
+      // Créer une ligne pour chaque produit de la commande
+      commande.produits.forEach((produit, produitIndex) => {
+        const row = tbody.insertRow();
+
+        // Pour la première ligne de produit, afficher les infos client
+        if (produitIndex === 0) {
+          row.innerHTML = `
+            <td rowspan="${
+              commande.produits.length
+            }" style="vertical-align: middle; background: ${
+            commande.statut === "préparée" ? "#d4edda" : "#fff3cd"
+          };">
+              <strong>${commande.client}</strong><br>
+              <small>${commande.date}</small><br>
+              <span style="color: #666;">Total: ${commande.total.toFixed(
+                2
+              )} €</span>
+            </td>
+            <td>${produit.produit}</td>
+            <td>${produit.quantite}</td>
+            <td>${produit.unite}</td>
+            <td>
+              <span style="color: ${
+                commande.statut === "préparée" ? "#28a745" : "#f39c12"
+              }; font-weight: bold;">
+                ${
+                  commande.statut === "préparée"
+                    ? "✅ Préparée"
+                    : "⏳ À préparer"
+                }
+              </span>
+            </td>
+            <td rowspan="${
+              commande.produits.length
+            }" style="vertical-align: middle;">
+              ${
+                commande.statut === "préparée"
+                  ? '<span style="color: #28a745;">✅ Terminé</span>'
+                  : `<button onclick="marquerCommePrepare(${index})" class="btn-preparer">📦 Marquer comme préparée</button>`
+              }
+            </td>
+          `;
+        } else {
+          // Pour les autres lignes, seulement les infos produit
+          row.innerHTML = `
+            <td>${produit.produit}</td>
+            <td>${produit.quantite}</td>
+            <td>${produit.unite}</td>
+            <td>
+              <span style="color: ${
+                commande.statut === "préparée" ? "#28a745" : "#f39c12"
+              }; font-weight: bold;">
+                ${
+                  commande.statut === "préparée"
+                    ? "✅ Préparée"
+                    : "⏳ À préparer"
+                }
+              </span>
+            </td>
+          `;
+        }
+      });
+    });
   } catch (err) {
     console.error("Erreur chargement commandes à préparer :", err);
+    afficherMessage("❌ Erreur lors du chargement des commandes", "error");
+  }
+}
+
+// Marquer une commande comme préparée
+async function marquerCommePrepare(index) {
+  if (!confirm("Marquer cette commande comme préparée ?")) {
+    return;
+  }
+
+  try {
+    const commandes = await lireCommandes();
+    commandes[index].statut = "préparée";
+
+    const succes = await sauvegarderCommandes(commandes);
+
+    if (succes) {
+      chargerCommandesPreparation();
+      afficherMessage("✅ Commande marquée comme préparée !", "success");
+    } else {
+      afficherMessage("❌ Erreur lors de la mise à jour", "error");
+    }
+  } catch (error) {
+    console.error("Erreur:", error);
+    afficherMessage("❌ Erreur de connexion", "error");
   }
 }
 
@@ -213,6 +336,9 @@ function afficherMessage(message, type) {
 document.addEventListener("DOMContentLoaded", () => {
   chargerStock();
   chargerCommandesPreparation();
+
+  // Actualiser les commandes toutes les 30 secondes
+  setInterval(chargerCommandesPreparation, 30000);
 
   // Message de bienvenue
   setTimeout(() => {
