@@ -1,0 +1,66 @@
+[
+  {
+    "produit": "Patates",
+    "quantite": 3,
+    "prix": 3,
+    "unite": "kg",
+    "client": "Gabin",
+    "statut": "préparée"
+  },
+  {
+    "produit": "salades",
+    "quantite": 4,
+    "prix": 3,
+    "unite": "pieces",
+    "client": "Gabin",
+    "statut": "préparée"
+  },
+  {
+    "produit": "Oeuf",
+    "quantite": 3,
+    "prix": 2,
+    "unite": "Boîtes (6 oeufs)",
+    "client": "Gabin",
+    "statut": "préparée"
+  },
+  {
+    "produit": "Carottes",
+    "quantite": 1,
+    "prix": 3,
+    "unite": "bottes",
+    "client": "Gabin",
+    "statut": "préparée"
+  },
+  {
+    "produit": "salades",
+    "quantite": 21,
+    "prix": 3,
+    "unite": "pieces",
+    "client": "Abby",
+    "statut": "préparée"
+  },
+  {
+    "produit": "Oeuf",
+    "quantite": 4,
+    "prix": 2,
+    "unite": "Boîtes (6 oeufs)",
+    "client": "Abby",
+    "statut": "préparée"
+  },
+  {
+    "produit": "Carottes",
+    "quantite": 7,
+    "prix": 3,
+    "unite": "bottes",
+    "client": "Abby",
+    "statut": "préparée"
+  },
+  {
+    "produit": "Patates",
+    "quantite": 12,
+    "prix": 3,
+    "unite": "kg",
+    "client": "Abby",
+    "statut": "préparée"
+  }
+]

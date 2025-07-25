@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ferme du Chat Noir - Légumes Frais de Saison</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header>
+      <nav class="container">
+        <div class="logo">Ferme du Chat Noir</div>
+        <ul class="nav-links">
+          <li><a href="#home">Accueil</a></li>
+          <li><a href="#products">Nos Légumes</a></li>
+          <li><a href="#about">À Propos</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <section id="home" class="hero">
+      <div class="container">
+        <div class="hero-content">
+          <h1>Légumes Frais du Jardin</h1>
+          <p>Découvrez nos légumes de saison cultivés avec passion 🌱</p>
+          <a href="#products" class="cta-button">Commander Maintenant</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="products" class="container">
+      <h2 class="section-title">Nos Légumes Disponibles</h2>
+      <div class="products-grid" id="productsGrid">
+        <!-- Les produits seront générés par JavaScript -->
+      </div>
+    </section>
+
+    <section id="about" class="about">
+      <div class="container">
+        <h2 class="section-title">Notre Histoire</h2>
+        <div class="about-content">
+          <div class="about-text fade-in">
+            <p>
+              La Ferme du Chat Noir est une exploitation familiale qui cultive
+              des légumes frais et de saison depuis plus de 20 ans. Nous nous
+              engageons à fournir des produits de qualité, cultivés dans le
+              respect de l'environnement.
+            </p>
+            <p>
+              Notre objectif est de rendre les légumes frais accessibles à tous,
+              des plus jeunes aux plus âgés, grâce à notre service de commande
+              en ligne simple et efficace.
+            </p>
+            <p>
+              Chaque légume est récolté à maturité et préparé avec soin pour
+              vous garantir fraîcheur et saveur optimales.
+            </p>
+          </div>
+          <div class="about-image fade-in">
+            <img
+              id="aboutImage"
+              src="/img/concombre.webp"
+              alt="photo du maraîcher avec des concombres"
+            />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer id="contact">
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-section">
+            <h3>Contact</h3>
+            <p>📞 06 48 46 68 53</p>
+          </div>
+          <div class="footer-section">
+            <h3>Horaires</h3>
+            <p>Mer: 10h - 14h</p>
+            <p>Autres jours: Fermé</p>
+          </div>
+        </div>
+        Naturellement délicieux | Conception par
+        <a
+          href="https://gabinsubri.com"
+          target="_blank"
+          rel="noopener"
+          class="dev-signature"
+          >Gabin SUBRI</a
+        >
+      </div>
+    </footer>
+
+    <!-- Panier latéral -->
+    <div class="cart-sidebar" id="cartSidebar">
+      <div class="cart-header">
+        <h3>Mon Panier</h3>
+        <button class="close-cart" onclick="toggleCart()">✖</button>
+      </div>
+      <div id="cartItems"></div>
+      <div class="cart-total" id="cartTotal">Total: 0.00€</div>
+      <button class="checkout-btn" onclick="checkout()">Commander</button>
+    </div>
+
+    <!-- Bouton panier flottant -->
+    <button class="cart-button" onclick="toggleCart()">
+      🛒
+      <span class="cart-count" id="cartCount">0</span>
+    </button>
+
+    <!-- Toast notification -->
+    <div class="toast" id="toast"></div>
+
+    <script src="script.js"></script>
+    <script src="legumes.js"></script>
+  </body>
+</html>

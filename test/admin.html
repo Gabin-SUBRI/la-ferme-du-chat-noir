@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Administration - Ferme du Chat Noir</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #f7fafc, #edf2f7);
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      .header {
+        background: linear-gradient(135deg, #1a202c, #2d3748);
+        color: white;
+        padding: 2rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      }
+
+      .header h1 {
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+      }
+
+      .header h1::before {
+        content: "🐱";
+        font-size: 3rem;
+        animation: bounce 2s infinite;
+      }
+
+      @keyframes bounce {
+        0%,
+        20%,
+        50%,
+        80%,
+        100% {
+          transform: translateY(0);
+        }
+        40% {
+          transform: translateY(-10px);
+        }
+        60% {
+          transform: translateY(-5px);
+        }
+      }
+
+      .tabs {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 2rem;
+      }
+
+      .tab-button {
+        background: white;
+        border: 2px solid #e2e8f0;
+        padding: 12px 24px;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 1rem;
+        font-weight: 500;
+      }
+
+      .tab-button.active {
+        background: linear-gradient(45deg, #48bb78, #68d391);
+        color: white;
+        border-color: #48bb78;
+      }
+
+      .tab-button:hover:not(.active) {
+        background: #f7fafc;
+        border-color: #48bb78;
+      }
+
+      .tab-content {
+        display: none;
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      }
+
+      .tab-content.active {
+        display: block;
+      }
+
+      .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+      }
+
+      .form-group {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .form-group label {
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: #2d3748;
+      }
+
+      .form-group input,
+      .form-group select {
+        padding: 12px;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: border-color 0.3s ease;
+      }
+
+      .form-group input:focus,
+      .form-group select:focus {
+        outline: none;
+        border-color: #48bb78;
+      }
+
+      .btn {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 600;
+      }
+
+      .btn-primary {
+        background: linear-gradient(45deg, #48bb78, #68d391);
+        color: white;
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(72, 187, 120, 0.3);
+      }
+
+      .btn-danger {
+        background: linear-gradient(45deg, #e53e3e, #fc8181);
+        color: white;
+      }
+
+      .btn-danger:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(229, 62, 62, 0.3);
+      }
+
+      .btn-secondary {
+        background: #e2e8f0;
+        color: #2d3748;
+      }
+
+      .btn-secondary:hover {
+        background: #cbd5e0;
+      }
+
+      .products-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+      }
+
+      .product-item {
+        background: #f7fafc;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 1.5rem;
+        transition: all 0.3s ease;
+      }
+
+      .product-item:hover {
+        border-color: #48bb78;
+        transform: translateY(-2px);
+      }
+
+      .product-header {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 1rem;
+      }
+
+      .product-icon {
+        font-size: 2.5rem;
+      }
+
+      .product-info h3 {
+        color: #2d3748;
+        margin-bottom: 0.5rem;
+      }
+
+      .product-info .price {
+        color: #48bb78;
+        font-weight: bold;
+        font-size: 1.1rem;
+      }
+
+      .product-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 1rem;
+      }
+
+      .status-toggle {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 1rem;
+      }
+
+      .switch {
+        position: relative;
+        display: inline-block;
+        width: 50px;
+        height: 24px;
+      }
+
+      .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        transition: 0.4s;
+        border-radius: 24px;
+      }
+
+      .slider:before {
+        position: absolute;
+        content: "";
+        height: 18px;
+        width: 18px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: 0.4s;
+        border-radius: 50%;
+      }
+
+      input:checked + .slider {
+        background-color: #48bb78;
+      }
+
+      input:checked + .slider:before {
+        transform: translateX(26px);
+      }
+
+      .toast {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #48bb78;
+        color: white;
+        padding: 15px 25px;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        transform: translateX(400px);
+        transition: transform 0.3s ease;
+        z-index: 1000;
+      }
+
+      .toast.show {
+        transform: translateX(0);
+      }
+
+      .toast.error {
+        background: #e53e3e;
+      }
+
+      .export-section {
+        background: #f7fafc;
+        border-radius: 12px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+      }
+
+      .export-section h3 {
+        margin-bottom: 1rem;
+        color: #2d3748;
+      }
+
+      .export-buttons {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+      }
+
+      .code-output {
+        background: #1a202c;
+        color: #68d391;
+        padding: 1.5rem;
+        border-radius: 8px;
+        font-family: "Courier New", monospace;
+        font-size: 0.9rem;
+        overflow-x: auto;
+        margin-top: 1rem;
+        white-space: pre-wrap;
+      }
+
+      @media (max-width: 768px) {
+        .tabs {
+          flex-direction: column;
+        }
+
+        .form-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .products-list {
+          grid-template-columns: 1fr;
+        }
+
+        .product-actions {
+          flex-direction: column;
+        }
+
+        .export-buttons {
+          flex-direction: column;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>Administration</h1>
+        <p>Gérez vos légumes et produits de la ferme</p>
+      </div>
+
+      <div class="tabs">
+        <button class="tab-button active" onclick="switchTab('manage')">
+          Gérer les Produits
+        </button>
+        <button class="tab-button" onclick="switchTab('add')">
+          Ajouter un Produit
+        </button>
+        <button class="tab-button" onclick="switchTab('export')">
+          Exporter les Données
+        </button>
+      </div>
+
+      <div id="manage-tab" class="tab-content active">
+        <h2>Produits Actuels</h2>
+        <div id="products-container" class="products-list">
+          <!-- Les produits seront affichés ici -->
+        </div>
+      </div>
+
+      <div id="add-tab" class="tab-content">
+        <h2>Ajouter un Nouveau Produit</h2>
+        <form id="product-form">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="product-name">Nom du produit</label>
+              <input type="text" id="product-name" required />
+            </div>
+            <div class="form-group">
+              <label for="product-price">Prix (€)</label>
+              <input type="number" id="product-price" step="0.01" required />
+            </div>
+            <div class="form-group">
+              <label for="product-icon">Emoji</label>
+              <input type="text" id="product-icon" placeholder="🥕" required />
+            </div>
+            <div class="form-group">
+              <label for="product-unit">Unité</label>
+              <select id="product-unit" required>
+                <option value="kg">kg</option>
+                <option value="pièce">pièce</option>
+                <option value="botte">botte</option>
+                <option value="barquette">barquette</option>
+                <option value="boite">boite</option>
+              </select>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary">
+            Ajouter le Produit
+          </button>
+        </form>
+      </div>
+
+      <div id="export-tab" class="tab-content">
+        <div class="export-section">
+          <h3>Exporter les Données</h3>
+          <p>
+            Copiez le code JavaScript généré et remplacez le contenu du fichier
+            script.js
+          </p>
+          <div class="export-buttons">
+            <button class="btn btn-primary" onclick="exportToJS()">
+              Générer le Code JavaScript
+            </button>
+            <button class="btn btn-secondary" onclick="copyToClipboard()">
+              Copier dans le Presse-papier
+            </button>
+            <input id="inputLegumes" type="text" />
+            <button onclick="envoyer()">Enregistrer</button>
+          </div>
+          <div id="code-output" class="code-output" style="display: none"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal d'édition -->
+    <div
+      id="edit-modal"
+      style="
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1001;
+      "
+    >
+      <div
+        style="
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          background: white;
+          padding: 2rem;
+          border-radius: 15px;
+          width: 90%;
+          max-width: 500px;
+        "
+      >
+        <h3>Modifier le Produit</h3>
+        <form id="edit-form">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="edit-name">Nom du produit</label>
+              <input type="text" id="edit-name" required />
+            </div>
+            <div class="form-group">
+              <label for="edit-price">Prix (€)</label>
+              <input type="number" id="edit-price" step="0.01" required />
+            </div>
+            <div class="form-group">
+              <label for="edit-icon">Emoji</label>
+              <input type="text" id="edit-icon" required />
+            </div>
+            <div class="form-group">
+              <label for="edit-unit">Unité</label>
+              <select id="edit-unit" required>
+                <option value="kg">kg</option>
+                <option value="pièce">pièce</option>
+                <option value="botte">botte</option>
+                <option value="barquette">barquette</option>
+                <option value="boite">boite</option>
+              </select>
+            </div>
+          </div>
+          <div style="display: flex; gap: 1rem; margin-top: 1.5rem">
+            <button type="submit" class="btn btn-primary">Sauvegarder</button>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              onclick="closeEditModal()"
+            >
+              Annuler
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Toast notification -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+      // Données par défaut des produits
+      let products = [
+        {
+          id: 1,
+          name: "Tomates",
+          price: 3.5,
+          icon: "🍅",
+          unit: "kg",
+          available: true,
+        },
+        {
+          id: 2,
+          name: "Carottes",
+          price: 2.2,
+          icon: "🥕",
+          unit: "kg",
+          available: true,
+        },
+        {
+          id: 3,
+          name: "Courgettes",
+          price: 2.8,
+          icon: "🥒",
+          unit: "kg",
+          available: true,
+        },
+        {
+          id: 4,
+          name: "Salade",
+          price: 1.5,
+          icon: "🥬",
+          unit: "pièce",
+          available: true,
+        },
+        {
+          id: 5,
+          name: "Pommes de terre",
+          price: 1.8,
+          icon: "🥔",
+          unit: "kg",
+          available: true,
+        },
+        {
+          id: 6,
+          name: "Aubergines",
+          price: 1.2,
+          icon: "🍆",
+          unit: "kg",
+          available: true,
+        },
+        {
+          id: 7,
+          name: "Épinards",
+          price: 3.0,
+          icon: "🌿",
+          unit: "kg",
+          available: true,
+        },
+        {
+          id: 8,
+          name: "Brocolis",
+          price: 3.2,
+          icon: "🥦",
+          unit: "kg",
+          available: true,
+        },
+      ];
+
+      let editingProductId = null;
+
+      function envoyer() {
+        console.log("Envoi des légumes...");
+        const txt = document
+          .getElementById("inputLegumes")
+          .value.split(",")
+          .map((l) => l.trim());
+        fetch("/maj-legumes", {
+          method: "POST",
+          body: JSON.stringify({ legumes: txt }),
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+
+      // Charger les données sauvegardées
+      function loadProducts() {
+        const saved = localStorage.getItem("ferme-products");
+        if (saved) {
+          products = JSON.parse(saved);
+        }
+      }
+
+      // Sauvegarder les données
+      function saveProducts() {
+        localStorage.setItem("ferme-products", JSON.stringify(products));
+      }
+
+      // Afficher les produits
+      function displayProducts() {
+        const container = document.getElementById("products-container");
+        container.innerHTML = "";
+
+        products.forEach((product) => {
+          const productDiv = document.createElement("div");
+          productDiv.className = "product-item";
+          productDiv.innerHTML = `
+                    <div class="product-header">
+                        <span class="product-icon">${product.icon}</span>
+                        <div class="product-info">
+                            <h3>${product.name}</h3>
+                            <div class="price">${product.price.toFixed(2)}€ / ${
+            product.unit
+          }</div>
+                        </div>
+                    </div>
+                    <div class="status-toggle">
+                        <span>Disponible:</span>
+                        <label class="switch">
+                            <input type="checkbox" ${
+                              product.available ? "checked" : ""
+                            } 
+                                   onchange="toggleAvailability(${product.id})">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="product-actions">
+                        <button class="btn btn-primary" onclick="editProduct(${
+                          product.id
+                        })">Modifier</button>
+                        <button class="btn btn-danger" onclick="deleteProduct(${
+                          product.id
+                        })">Supprimer</button>
+                    </div>
+                `;
+          container.appendChild(productDiv);
+        });
+      }
+
+      // Changer d'onglet
+      function switchTab(tabName) {
+        // Masquer tous les onglets
+        document.querySelectorAll(".tab-content").forEach((tab) => {
+          tab.classList.remove("active");
+        });
+        document.querySelectorAll(".tab-button").forEach((btn) => {
+          btn.classList.remove("active");
+        });
+
+        // Afficher l'onglet sélectionné
+        document.getElementById(tabName + "-tab").classList.add("active");
+        event.target.classList.add("active");
+      }
+
+      // Ajouter un produit
+      document
+        .getElementById("product-form")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+
+          const name = document.getElementById("product-name").value;
+          const price = parseFloat(
+            document.getElementById("product-price").value
+          );
+          const icon = document.getElementById("product-icon").value;
+          const unit = document.getElementById("product-unit").value;
+
+          const newProduct = {
+            id: Math.max(...products.map((p) => p.id)) + 1,
+            name: name,
+            price: price,
+            icon: icon,
+            unit: unit,
+            available: true,
+          };
+
+          products.push(newProduct);
+          saveProducts();
+          displayProducts();
+          showToast("Produit ajouté avec succès!");
+
+          // Réinitialiser le formulaire
+          this.reset();
+        });
+
+      // Modifier un produit
+      function editProduct(id) {
+        const product = products.find((p) => p.id === id);
+        if (!product) return;
+
+        editingProductId = id;
+        document.getElementById("edit-name").value = product.name;
+        document.getElementById("edit-price").value = product.price;
+        document.getElementById("edit-icon").value = product.icon;
+        document.getElementById("edit-unit").value = product.unit;
+
+        document.getElementById("edit-modal").style.display = "block";
+      }
+
+      // Fermer le modal d'édition
+      function closeEditModal() {
+        document.getElementById("edit-modal").style.display = "none";
+        editingProductId = null;
+      }
+
+      // Sauvegarder les modifications
+      document
+        .getElementById("edit-form")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+
+          const product = products.find((p) => p.id === editingProductId);
+          if (!product) return;
+
+          product.name = document.getElementById("edit-name").value;
+          product.price = parseFloat(
+            document.getElementById("edit-price").value
+          );
+          product.icon = document.getElementById("edit-icon").value;
+          product.unit = document.getElementById("edit-unit").value;
+
+          saveProducts();
+          displayProducts();
+          closeEditModal();
+          showToast("Produit modifié avec succès!");
+        });
+
+      // Supprimer un produit
+      function deleteProduct(id) {
+        if (confirm("Êtes-vous sûr de vouloir supprimer ce produit ?")) {
+          products = products.filter((p) => p.id !== id);
+          saveProducts();
+          displayProducts();
+          showToast("Produit supprimé avec succès!");
+        }
+      }
+
+      // Basculer la disponibilité
+      function toggleAvailability(id) {
+        const product = products.find((p) => p.id === id);
+        if (product) {
+          product.available = !product.available;
+          saveProducts();
+          showToast(
+            `${product.name} ${product.available ? "activé" : "désactivé"}`
+          );
+        }
+      }
+
+      // Exporter vers JavaScript
+      function exportToJS() {
+        const jsCode = `const products = ${JSON.stringify(products, null, 2)};`;
+
+        document.getElementById("code-output").textContent = jsCode;
+        document.getElementById("code-output").style.display = "block";
+        showToast("Code JavaScript généré avec succès!");
+      }
+
+      // Copier dans le presse-papier
+      async function copyToClipboard() {
+        const codeOutput = document.getElementById("code-output");
+        if (codeOutput.style.display === "none") {
+          showToast("Veuillez d'abord générer le code!", "error");
+          return;
+        }
+
+        try {
+          await navigator.clipboard.writeText(codeOutput.textContent);
+          showToast("Code copié dans le presse-papier!");
+        } catch (err) {
+          showToast("Erreur lors de la copie", "error");
+        }
+      }
+
+      // Afficher une notification toast
+      function showToast(message, type = "success") {
+        const toast = document.getElementById("toast");
+        toast.textContent = message;
+        toast.className = "toast show";
+        if (type === "error") {
+          toast.classList.add("error");
+        }
+
+        setTimeout(() => {
+          toast.classList.remove("show");
+          setTimeout(() => {
+            toast.classList.remove("error");
+          }, 300);
+        }, 3000);
+      }
+
+      // Initialisation
+      document.addEventListener("DOMContentLoaded", function () {
+        loadProducts();
+        displayProducts();
+      });
+
+      // Fermer le modal en cliquant à l'extérieur
+      document
+        .getElementById("edit-modal")
+        .addEventListener("click", function (e) {
+          if (e.target === this) {
+            closeEditModal();
+          }
+        });
+    </script>
+  </body>
+</html>
