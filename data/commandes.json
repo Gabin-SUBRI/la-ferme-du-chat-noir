@@ -62,5 +62,20 @@
     "unite": "kg",
     "client": "Abby",
     "statut": "préparée"
+  },
+  {
+    "produit": "salades",
+    "quantite": 24,
+    "prix": 2,
+    "unite": "pieces",
+    "client": "Mymy",
+    "statut": "préparée"
+  },
+  {
+    "produit": "salades",
+    "quantite": 10,
+    "prix": 2,
+    "unite": "pieces",
+    "client": "Emma"
   }
 ]
