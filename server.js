@@ -1,14 +1,34 @@
 const fs = require("fs");
 const express = require("express");
+const cors = require("cors"); // ← NOUVEAU
 const path = require("path");
 const app = express();
 const PORT = 3000;
 
-app.use(express.static("public"));
+// Middleware de logs (optionnel pour debug)
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.path}`);
+  next();
+});
+
+// CORS - permettre les requêtes du frontend
+app.use(
+  cors({
+    origin: [
+      "http://localhost:3001",
+      "http://localhost:5173",
+      "http://127.0.0.1:5500",
+    ],
+    credentials: true,
+  })
+);
+
 app.use(express.json());
 
 const fichierCommandes = path.join(__dirname, "data", "commandes.json");
+const fichierStock = path.join(__dirname, "data", "stock.json");
 
+// Routes existantes (pas de changement)
 app.get("/commandes", (req, res) => {
   const commandes = JSON.parse(fs.readFileSync(fichierCommandes));
   res.json(commandes);
@@ -22,9 +42,6 @@ app.post("/commande", (req, res) => {
   res.sendStatus(201);
 });
 
-app.listen(PORT, () =>
-  console.log(`Serveur lancé sur http://localhost:${PORT}`)
-);
 app.delete("/commande/:index", (req, res) => {
   const index = Number(req.params.index);
   const commandes = JSON.parse(fs.readFileSync(fichierCommandes));
@@ -32,8 +49,6 @@ app.delete("/commande/:index", (req, res) => {
   fs.writeFileSync(fichierCommandes, JSON.stringify(commandes, null, 2));
   res.sendStatus(204);
 });
-// Stock des légumes
-const fichierStock = path.join(__dirname, "data", "stock.json");
 
 app.get("/stock", (req, res) => {
   const stock = JSON.parse(fs.readFileSync(fichierStock));
@@ -57,8 +72,6 @@ app.delete("/stock/:index", (req, res) => {
 
 app.post("/valider-commande", (req, res) => {
   const nouvellesCommandes = req.body;
-  const fichierStock = path.join(__dirname, "data", "stock.json");
-  const fichierCommandes = path.join(__dirname, "data", "commandes.json");
 
   try {
     // 📦 Lecture du stock
@@ -119,17 +132,26 @@ app.get("/commandes-a-preparer", (req, res) => {
 
 app.put("/commande/statut/:index", (req, res) => {
   const index = Number(req.params.index);
-  const commandesPath = path.join(__dirname, "data", "commandes.json");
 
   try {
-    const commandes = JSON.parse(fs.readFileSync(commandesPath, "utf-8"));
+    const commandes = JSON.parse(fs.readFileSync(fichierCommandes, "utf-8"));
     if (!commandes[index]) return res.sendStatus(404);
 
     commandes[index].statut = "préparée";
-    fs.writeFileSync(commandesPath, JSON.stringify(commandes, null, 2));
+    fs.writeFileSync(fichierCommandes, JSON.stringify(commandes, null, 2));
     res.sendStatus(200);
   } catch (err) {
     console.error("Erreur modification statut :", err);
     res.sendStatus(500);
   }
 });
+
+// Middleware d'erreur global
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ error: "Erreur serveur" });
+});
+
+app.listen(PORT, () =>
+  console.log(`🚀 Serveur backend lancé sur http://localhost:${PORT}`)
+);
