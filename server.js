@@ -73,8 +73,19 @@ app.post("/api/admin/login", (req, res) => {
       });
     }
 
-    // Récupérer le mot de passe depuis les variables d'environnement
-    const adminPassword = process.env.ADMIN_PASSWORD || "ferme2025";
+    // ✅ MODIFICATION ICI - Sécurisé sans fallback
+    const adminPassword = process.env.ADMIN_PASSWORD;
+
+    // Vérifier que la variable d'environnement existe
+    if (!adminPassword) {
+      console.error(
+        "❌ ADMIN_PASSWORD non configuré dans les variables d'environnement"
+      );
+      return res.status(500).json({
+        success: false,
+        message: "Configuration serveur manquante",
+      });
+    }
 
     console.log("Tentative de connexion admin"); // Pour debug (ne pas afficher le mot de passe!)
 
