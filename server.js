@@ -266,12 +266,25 @@ app.post("/valider-commande", (req, res) => {
 
 // Routes pour le stock (administration)
 app.post("/stock", verifierAdmin, (req, res) => {
-  const stock = lireFichierJSON(fichierStock);
-  stock.push(req.body);
+  console.log("🔍 DEBUG - Début ajout stock");
+  console.log("🔍 Données reçues:", req.body);
 
-  if (ecrireFichierJSON(fichierStock, stock)) {
-    res.sendStatus(201);
-  } else {
+  try {
+    const stock = lireFichierJSON(fichierStock);
+    console.log("🔍 Stock actuel lu:", stock.length, "items");
+
+    stock.push(req.body);
+    console.log("🔍 Stock après push:", stock.length, "items");
+
+    if (ecrireFichierJSON(fichierStock, stock)) {
+      console.log("🔍 Écriture réussie!");
+      res.sendStatus(201);
+    } else {
+      console.error("🔍 Échec écriture fichier");
+      res.status(500).json({ error: "Erreur lors de l'ajout au stock" });
+    }
+  } catch (error) {
+    console.error("🔍 ERREUR CATCH:", error);
     res.status(500).json({ error: "Erreur lors de l'ajout au stock" });
   }
 });
