@@ -37,7 +37,7 @@ const fichierStock = path.join(process.cwd(), "data", "stock.json");
 // ========================================
 // SYSTÈME D'AUTHENTIFICATION SÉCURISÉ
 // ========================================
-
+//oui
 // Stocker les tokens admin en mémoire (pour une solution simple)
 // En production avancée, utilisez Redis ou une base de données
 const tokensAdmin = new Set();
