@@ -4,6 +4,7 @@ const cors = require("cors");
 const path = require("path");
 const crypto = require("crypto");
 const app = express();
+const { supabase } = require("./supabase-server"); // ← NOUVEAU
 
 // Port pour Vercel (utilise le port fourni par l'environnement)
 const PORT = process.env.PORT || 3000;
@@ -176,87 +177,124 @@ function ecrireFichierJSON(cheminFichier, donnees) {
 // ROUTES PUBLIQUES (pas d'authentification)
 // ========================================
 
-// Routes pour les commandes publiques
-app.get("/commandes", (req, res) => {
-  const commandes = lireFichierJSON(fichierCommandes);
-  res.json(commandes);
-});
+// Route pour le stock (lecture publique)
+app.get("/stock", async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from("stock")
+      .select("*")
+      .order("nom");
 
-app.post("/commande", (req, res) => {
-  const nouvelleCommande = req.body;
-  const commandes = lireFichierJSON(fichierCommandes);
-  commandes.push(nouvelleCommande);
-
-  if (ecrireFichierJSON(fichierCommandes, commandes)) {
-    res.sendStatus(201);
-  } else {
-    res.status(500).json({ error: "Erreur lors de l'ajout de la commande" });
+    if (error) throw error;
+    res.json(data || []);
+  } catch (error) {
+    console.error("Erreur lecture stock:", error);
+    res.status(500).json({ error: "Erreur lors de la lecture du stock" });
   }
 });
 
-// Route pour le stock (lecture publique)
-app.get("/stock", (req, res) => {
-  const stock = lireFichierJSON(fichierStock);
-  res.json(stock);
+// Route pour ajouter au stock (admin)
+app.post("/stock", verifierAdmin, async (req, res) => {
+  try {
+    const { error } = await supabase.from("stock").insert([req.body]);
+
+    if (error) throw error;
+    res.sendStatus(201);
+  } catch (error) {
+    console.error("Erreur ajout stock:", error);
+    res.status(500).json({ error: "Erreur lors de l'ajout au stock" });
+  }
+});
+
+// Route pour supprimer du stock (admin)
+app.delete("/stock/:id", verifierAdmin, async (req, res) => {
+  try {
+    const { error } = await supabase
+      .from("stock")
+      .delete()
+      .eq("id", req.params.id);
+
+    if (error) throw error;
+    res.sendStatus(204);
+  } catch (error) {
+    console.error("Erreur suppression stock:", error);
+    res.status(500).json({ error: "Erreur lors de la suppression" });
+  }
 });
 
 // Route pour valider une commande (publique)
-app.post("/valider-commande", (req, res) => {
+app.post("/valider-commande", async (req, res) => {
   const nouvellesCommandes = req.body;
 
   try {
-    // 📦 Lecture du stock
-    const stock = lireFichierJSON(fichierStock);
-
-    // 🛑 Vérifier les ruptures de stock avant de traiter
+    // 1. Vérifier le stock
     for (const cmd of nouvellesCommandes) {
-      const item = stock.find(
-        (s) => s.produit === cmd.produit || s.nom === cmd.produit
-      );
-      if (!item || item.quantite <= 0) {
-        return res
-          .status(400)
-          .json({ error: `"${cmd.produit}" est en rupture de stock` });
-      }
-      if (item.quantite < cmd.quantite) {
+      const { data: stockItem, error } = await supabase
+        .from("stock")
+        .select("quantite")
+        .eq("nom", cmd.produit)
+        .single();
+
+      if (error || !stockItem || stockItem.quantite < cmd.quantite) {
         return res.status(400).json({
-          error: `Stock insuffisant pour "${cmd.produit}". Disponible: ${item.quantite}`,
+          error: `Stock insuffisant pour "${cmd.produit}"`,
         });
       }
     }
 
-    // 🧮 Mise à jour du stock
-    nouvellesCommandes.forEach((cmd) => {
-      const item = stock.find(
-        (s) => s.produit === cmd.produit || s.nom === cmd.produit
-      );
-      if (item) {
-        item.quantite -= cmd.quantite;
-        if (item.quantite < 0) item.quantite = 0;
-      }
-    });
+    // 2. Insérer les commandes
+    const { error: commandeError } = await supabase
+      .from("commandes")
+      .insert(nouvellesCommandes);
 
-    // 💾 Sauvegarde du stock
-    if (!ecrireFichierJSON(fichierStock, stock)) {
-      return res
-        .status(500)
-        .json({ error: "Erreur lors de la mise à jour du stock" });
-    }
+    if (commandeError) throw commandeError;
 
-    // 📝 Enregistrement des commandes
-    const commandesExistantes = lireFichierJSON(fichierCommandes);
-    const toutesCommandes = [...commandesExistantes, ...nouvellesCommandes];
+    // 3. Mettre à jour le stock
+    for (const cmd of nouvellesCommandes) {
+      const { error: updateError } = await supabase.rpc("decrementer_stock", {
+        produit_nom: cmd.produit,
+        quantite_vendue: cmd.quantite,
+      });
 
-    if (!ecrireFichierJSON(fichierCommandes, toutesCommandes)) {
-      return res
-        .status(500)
-        .json({ error: "Erreur lors de l'enregistrement des commandes" });
+      if (updateError) throw updateError;
     }
 
     res.json({ success: true, message: "Commande validée avec succès" });
   } catch (err) {
-    console.error("💥 Erreur dans valider-commande :", err);
+    console.error("Erreur validation commande:", err);
     res.status(500).json({ error: "Erreur serveur lors de la validation" });
+  }
+});
+
+// Route pour les commandes à préparer (admin)
+app.get("/commandes-a-preparer", verifierAdmin, async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from("commandes")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) throw error;
+    res.json(data || []);
+  } catch (error) {
+    console.error("Erreur lecture commandes:", error);
+    res.status(500).json({ error: "Erreur serveur" });
+  }
+});
+
+// Route pour changer le statut d'une commande (admin)
+app.put("/commande/statut/:id", verifierAdmin, async (req, res) => {
+  try {
+    const { error } = await supabase
+      .from("commandes")
+      .update({ statut: "préparée" })
+      .eq("id", req.params.id);
+
+    if (error) throw error;
+    res.json({ success: true, message: "Statut mis à jour" });
+  } catch (error) {
+    console.error("Erreur modification statut:", error);
+    res.status(500).json({ error: "Erreur serveur" });
   }
 });
 
