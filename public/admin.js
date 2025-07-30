@@ -180,8 +180,6 @@ async function sauvegarderCommandes(commandes) {
   }
 }
 
-// Dans admin.js, remplacer la fonction chargerCommandesPreparation par ceci :
-
 async function chargerCommandesPreparation() {
   try {
     const commandes = await lireCommandes();
