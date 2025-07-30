@@ -180,6 +180,8 @@ async function sauvegarderCommandes(commandes) {
   }
 }
 
+// Dans admin.js, remplacer la fonction chargerCommandesPreparation par ceci :
+
 async function chargerCommandesPreparation() {
   try {
     const commandes = await lireCommandes();
@@ -196,68 +198,126 @@ async function chargerCommandesPreparation() {
     commandes.sort((a, b) => new Date(b.date) - new Date(a.date));
 
     commandes.forEach((commande, index) => {
-      // Créer une ligne pour chaque produit de la commande
-      commande.produits.forEach((produit, produitIndex) => {
-        const row = tbody.insertRow();
-
-        // Pour la première ligne de produit, afficher les infos client
-        if (produitIndex === 0) {
-          row.innerHTML = `
-            <td rowspan="${
-              commande.produits.length
-            }" style="vertical-align: middle; background: ${
-            commande.statut === "préparée" ? "#d4edda" : "#fff3cd"
-          };">
-              <strong>${commande.client}</strong><br>
-              <small>${commande.date}</small><br>
-              <span style="color: #666;">Total: ${commande.total.toFixed(
+      // Créer une ligne de titre pour chaque commande
+      const titleRow = tbody.insertRow();
+      titleRow.innerHTML = `
+        <td colspan="6" style="
+          background: ${commande.statut === "préparée" ? "#d4edda" : "#fff3cd"};
+          padding: 15px;
+          font-weight: bold;
+          border-top: 3px solid ${
+            commande.statut === "préparée" ? "#28a745" : "#f39c12"
+          };
+        ">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <strong style="font-size: 1.1em;">🧑‍🌾 ${commande.client}</strong>
+              <span style="margin-left: 15px; color: #666;">📅 ${
+                commande.date
+              }</span>
+              <span style="margin-left: 15px; color: #666;">💰 Total: ${commande.total.toFixed(
                 2
               )} €</span>
-            </td>
-            <td>${produit.produit}</td>
-            <td>${produit.quantite}</td>
-            <td>${produit.unite}</td>
-            <td>
+            </div>
+            <div>
               <span style="color: ${
                 commande.statut === "préparée" ? "#28a745" : "#f39c12"
-              }; font-weight: bold;">
+              }; font-weight: bold; margin-right: 15px;">
                 ${
                   commande.statut === "préparée"
                     ? "✅ Préparée"
                     : "⏳ À préparer"
                 }
               </span>
-            </td>
-            <td rowspan="${
-              commande.produits.length
-            }" style="vertical-align: middle;">
               ${
                 commande.statut === "préparée"
-                  ? '<span style="color: #28a745;">✅ Terminé</span>'
-                  : `<button onclick="marquerCommePrepare(${index})" class="btn-preparer">📦 Marquer comme préparée</button>`
+                  ? '<span style="color: #28a745; font-weight: bold;">✅ Terminé</span>'
+                  : `<button onclick="marquerCommePrepare(${index})" style="
+                      background: linear-gradient(135deg, #4caf50, #2e7d32);
+                      color: white;
+                      border: none;
+                      padding: 8px 16px;
+                      border-radius: 6px;
+                      cursor: pointer;
+                      font-weight: 600;
+                      transition: all 0.3s ease;
+                    " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(76,175,80,0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                      📦 Marquer comme préparée
+                    </button>`
               }
-            </td>
-          `;
-        } else {
-          // Pour les autres lignes, seulement les infos produit
-          row.innerHTML = `
-            <td>${produit.produit}</td>
-            <td>${produit.quantite}</td>
-            <td>${produit.unite}</td>
-            <td>
-              <span style="color: ${
-                commande.statut === "préparée" ? "#28a745" : "#f39c12"
-              }; font-weight: bold;">
-                ${
-                  commande.statut === "préparée"
-                    ? "✅ Préparée"
-                    : "⏳ À préparer"
-                }
-              </span>
-            </td>
-          `;
+            </div>
+          </div>
+        </td>
+      `;
+
+      // Créer les lignes de produits
+      commande.produits.forEach((produit, produitIndex) => {
+        const productRow = tbody.insertRow();
+        productRow.innerHTML = `
+          <td style="padding-left: 30px; border-left: 4px solid ${
+            commande.statut === "préparée" ? "#28a745" : "#f39c12"
+          };">
+            <strong>${commande.client}</strong>
+          </td>
+          <td><strong>${produit.produit}</strong></td>
+          <td style="text-align: center; font-weight: bold;">${
+            produit.quantite
+          }</td>
+          <td>${produit.unite}</td>
+          <td style="text-align: center;">
+            <span style="
+              background: ${
+                commande.statut === "préparée" ? "#d4edda" : "#fff3cd"
+              };
+              color: ${commande.statut === "préparée" ? "#28a745" : "#f39c12"};
+              padding: 4px 8px;
+              border-radius: 12px;
+              font-size: 0.85em;
+              font-weight: bold;
+            ">
+              ${commande.statut === "préparée" ? "✅ Prête" : "⏳ À préparer"}
+            </span>
+          </td>
+          <td style="text-align: center;">
+            ${
+              produitIndex === 0
+                ? `
+              ${
+                commande.statut === "préparée"
+                  ? '<span style="color: #28a745; font-weight: bold;">✅ Terminé</span>'
+                  : `<button onclick="marquerCommePrepare(${index})" style="
+                      background: linear-gradient(135deg, #4caf50, #2e7d32);
+                      color: white;
+                      border: none;
+                      padding: 6px 12px;
+                      border-radius: 4px;
+                      cursor: pointer;
+                      font-size: 0.85em;
+                      font-weight: 600;
+                    ">
+                      📦 Préparer
+                    </button>`
+              }
+            `
+                : ""
+            }
+          </td>
+        `;
+
+        // Style pour les lignes de produits
+        if (produitIndex > 0) {
+          productRow.style.backgroundColor =
+            commande.statut === "préparée" ? "#f8fff9" : "#fffbf0";
         }
       });
+
+      // Ajouter une ligne de séparation entre les commandes
+      if (index < commandes.length - 1) {
+        const separatorRow = tbody.insertRow();
+        separatorRow.innerHTML = `
+          <td colspan="6" style="height: 10px; background: transparent; border: none;"></td>
+        `;
+      }
     });
   } catch (err) {
     console.error("Erreur chargement commandes à préparer :", err);
