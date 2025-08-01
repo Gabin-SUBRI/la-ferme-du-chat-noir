@@ -248,7 +248,7 @@ async function chargerCommandesPreparation() {
         </td>
       `;
 
-      // Créer les lignes de produits
+      // Créer la ligne de produits
       commande.produits.forEach((produit, produitIndex) => {
         const productRow = tbody.insertRow();
         productRow.innerHTML = `
